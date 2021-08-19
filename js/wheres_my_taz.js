@@ -3,14 +3,52 @@
 //     Documentation: https://wiki.state.ma.us/display/massgis/ArcGIS+Server+-+Geocoding+-+Census+TIGER+2010
 // Author: Ben Krepp
 
+var wfsServerRoot = 'https://www.ctps.org/maploc/wfs';
+var demographics_layer = 'postgis:dest2040_taz_demographics';
+
 function process_geocoded_location(data) {
 	// Work with first (best) candidate: candidates[0]
 	var temp = data.candidates[0];
 	var x_coord = temp.location.x;
 	var y_coord = temp.location.y;
 	console.log('x = ' + x_coord + ', y = ' + y_coord);	
-	adjust_map_and_show_data(data)
-	// TBD: Fun stuff!
+	adjust_map_and_show_data(data);
+	
+	// *** TBD: Fun stuff - Create INTERSECTS query!
+	
+	// var cqlFilter = "BBOX(shape," + minx + "," + miny + "," + maxx + "," + maxy + ")";
+    var szUrl = wfsServerRoot + '?';
+    szUrl += '&service=wfs';
+    szUrl += '&version=1.0.0';
+    szUrl += '&request=getfeature';
+    szUrl += '&typename='+demographics_layer;
+    szUrl += '&outputformat=json';
+    szUrl += '&cql_filter=' + cqlFilter;    
+     // DEBUG
+    // console.log(szUrl);
+        
+    $.ajax({  url		: szUrl,
+			  type		: 'GET',
+			  dataType	: 'json',
+			  success	: 	function (data, textStatus, jqXHR) {	
+								var reader, aFeatures = [], props = {}, i, s;
+								reader = new ol.format.GeoJSON();
+								aFeatures = reader.readFeatures(jqXHR.responseText);
+								if (aFeatures.length === 0) {
+									alert('WFS request to get data from INTERSECTS query returned no features.');
+									return;
+								}
+								var _DEBUG_HOOK = 0;
+								renderTazData(aFeatures);
+								return;
+                            },
+        error       :   function (qXHR, textStatus, errorThrown ) {
+                            alert('WFS request to get data from INTERSECTS query failed.\n' +
+                                    'Status: ' + textStatus + '\n' +
+                                    'Error:  ' + errorThrown);
+							return;
+                        } // error handler for WFS request
+    });
 } // handle_geocode_response()
 
 function submit_geocode_request(street, city, zip) {
