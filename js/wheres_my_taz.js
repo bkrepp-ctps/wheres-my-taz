@@ -3,20 +3,52 @@
 //     Documentation: https://wiki.state.ma.us/display/massgis/ArcGIS+Server+-+Geocoding+-+Census+TIGER+2010
 // Author: Ben Krepp
 
-var wfsServerRoot = 'https://www.ctps.org/maploc/wfs';
-var demographics_layer = 'postgis:dest2040_taz_demographics';
+
+// Varioius things for WMS and WFS layers
+// First, folderol to allow the app to run on appsrvr3 as well as "in the wild"
+var serverRoot = location.protocol + '//' + location.hostname;
+var nameSpace;
+var geometry_field_name;
+if (location.hostname.includes('appsrvr3')) {   
+    serverRoot += ':8080/geoserver/';  
+	nameSpace = 'ctps_pg';
+	geometry_field_name = 'shape';
+} else {
+    serverRoot += '/maploc/';
+	nameSpace = 'postgis';
+	geometry_field_name = 'wkb_geometry';
+}
+var wmsServerRoot = serverRoot + '/wms'; 
+var wfsServerRoot = serverRoot + '/wfs'; 
+var demographics_layer = nameSpace + ':' + 'dest2040_taz_demographics';
+
+
+function render_taz_data(feature) {
+	var _DEBUG_HOOK = 0;
+	
+} // render_taz_data()
 
 function process_geocoded_location(data) {
 	// Work with first (best) candidate: candidates[0]
 	var temp = data.candidates[0];
 	var x_coord = temp.location.x;
 	var y_coord = temp.location.y;
+	
+	// DEBUG
 	console.log('x = ' + x_coord + ', y = ' + y_coord);	
-	adjust_map_and_show_data(data);
 	
-	// *** TBD: Fun stuff - Create INTERSECTS query!
-	
-	// var cqlFilter = "BBOX(shape," + minx + "," + miny + "," + maxx + "," + maxy + ")";
+
+	// Construct CQL "INTERSECTS" filter to use in WFS request
+    // Note: The first parameter of the INTERSECTS filer is the attribute containing the geographic data in the layer being queried.
+	var cqlFilter = "INTERSECTS(";
+	cqlFilter += geometry_field_name;
+	cqlFilter += ",";
+	cqlFilter += "POINT(";
+	cqlFilter += x_coord + " " + y_coord;
+	cqlFilter += "))";
+	// DEBUG
+	console.log(cqlFilter);
+
     var szUrl = wfsServerRoot + '?';
     szUrl += '&service=wfs';
     szUrl += '&version=1.0.0';
@@ -25,7 +57,7 @@ function process_geocoded_location(data) {
     szUrl += '&outputformat=json';
     szUrl += '&cql_filter=' + cqlFilter;    
      // DEBUG
-    // console.log(szUrl);
+    console.log(szUrl);
         
     $.ajax({  url		: szUrl,
 			  type		: 'GET',
@@ -39,7 +71,7 @@ function process_geocoded_location(data) {
 									return;
 								}
 								var _DEBUG_HOOK = 0;
-								renderTazData(aFeatures);
+								render_taz_data(aFeatures[0]);
 								return;
                             },
         error       :   function (qXHR, textStatus, errorThrown ) {
