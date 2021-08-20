@@ -22,9 +22,94 @@ var wmsServerRoot = serverRoot + '/wms';
 var wfsServerRoot = serverRoot + '/wfs'; 
 var demographics_layer = nameSpace + ':' + 'dest2040_taz_demographics';
 
+// OpenLayers 'map' object:
+var ol_map = null;
 
-function render_taz_data(feature) {
+// Max map resolution at which to label TAZ vector features.
+var maxResolutionForLabelingVectorFeatures = 1200;   
+// Our function to return text to label TAZ vector features
+//
+// Unabashedly borrowed from https://openlayers.org/en/latest/examples/vector-labels.html,
+// and subsequently morphed for our purposes.
+//
+var getText = function(feature, resolution) {
+  var maxResolution = maxResolutionForLabelingVectorFeatures;
+  var text = "TAZ " + String(feature.get('taz'));
+  if (resolution > maxResolution) {
+    text = '';
+  }
+  return text;
+};
+// Our createTextStyle function for labeling the TAZ vector layer
+//
+// Unabashedly borrowed from https://openlayers.org/en/latest/examples/vector-labels.html,
+// and subsequently morphed for our purposes.
+//
+var createTextStyle = function(feature, resolution) {
+  var align = 'center';
+  var baseline = 'middle';
+  var size = '14px';
+  var height = 1;
+  var offsetX = 0;
+  var offsetY = 0;
+  var weight = 'normal';
+  var placement = 'point';
+  var maxAngle = 45;
+  var overflow = 'true'; 
+  var rotation = 0;
+  var font = weight + ' ' + size + '/' + height + ' ' + 'Arial';
+  var fillColor = 'black';      // Color of label TEXT itself
+  var outlineColor = 'white';   // Color of label OUTLINE
+  var outlineWidth = 0;
+
+  return new ol.style.Text({
+    textAlign: align,
+    textBaseline: baseline,
+    font: font,
+    text: getText(feature, resolution),
+    fill: new ol.style.Fill({color: fillColor}),
+    stroke: new ol.style.Stroke({color: outlineColor, width: outlineWidth}),
+    offsetX: offsetX,
+    offsetY: offsetY,
+    placement: placement,
+    maxAngle: maxAngle,
+    overflow: overflow,
+    rotation: rotation
+  });
+};
+
+// Vector layer for rendering TAZes
+// Needs to be visible to initialize() and renderTazData() functions:
+var oTazLayer = new ol.layer.Vector({source: new ol.source.Vector({ wrapX: false }) });
+// Define style for the TAZ vector layer, and set that layers's style to it
+function myTazLayerStyle(feature, resolution) {
+	return new ol.style.Style({ fill	: new ol.style.Fill({ color: 'rgba(193,66,66,0.4)' }), 
+                                          stroke : new ol.style.Stroke({ color: 'rgba(0,0,255,1.0)', width: 3.0}),
+                                          text:   createTextStyle(feature, resolution)
+				});
+}
+oTazLayer.setStyle(myTazLayerStyle);
+
+
+function render_taz_data(taz_feature) {
 	var _DEBUG_HOOK = 0;
+	
+	// First, the attribute (properties) data
+    var props = taz_feature.getProperties();
+    // *** TBD: Render this stuff
+    
+    // Second, the spatial data
+    // Get the source for the TAZ vector layer
+	var vSource = oTazLayer.getSource();
+	// Clear anything that might previously be in the vector layer
+    vSource.clear();
+    vSource.addFeature(taz_feature);
+    // Set the source of the vector layer to the taz_feature
+	oTazLayer.setSource(vSource);
+    
+    // Pan/zoom map to the extent of the TAZ
+    var extent = oTazLayer.getSource().getExtent();
+    ol_map.getView().fit(extent, ol_map.getSize());
 	
 } // render_taz_data()
 
@@ -55,6 +140,7 @@ function process_geocoded_location(data) {
     szUrl += '&request=getfeature';
     szUrl += '&typename='+demographics_layer;
     szUrl += '&outputformat=json';
+	szUrl += '&srsname=EPSG:4326';  // NOTE: We must reproject the native geometry of the feature to the SRS of the map!
     szUrl += '&cql_filter=' + cqlFilter;    
      // DEBUG
     console.log(szUrl);
@@ -123,7 +209,9 @@ function submit_geocode_request(street, city, zip) {
 } // submit_geocode_request()
 
 function initialize() {
-    var map = new ol.Map({ layers: [ new ol.layer.Tile({ source: new ol.source.OSM() }) ],
+    ol_map = new ol.Map({ layers: [ new ol.layer.Tile({ source: new ol.source.OSM() }),
+	                                oTazLayer
+                                  ],
                            target: 'map',
                            view: new ol.View({ projection: 'EPSG:4326', 
 						                       center: [-71.057083, 42.3601],
