@@ -91,12 +91,61 @@ function myTazLayerStyle(feature, resolution) {
 oTazLayer.setStyle(myTazLayerStyle);
 
 
-function render_taz_data(taz_feature) {
-	var _DEBUG_HOOK = 0;
+function render_taz_props(taz_feature) {
+	var props = taz_feature.getProperties();
+
+	var taz = props['taz'],
+		town = props['town'],
+		land_area = props['land_area'],
+		census_hh_2010 = props['census_hh_2010'],
+		total_lowinc_hh_2010 = props['total_lowinc_hh_2010'],
+		total_zero_veh_hh_2010 = props['total_zero_veh_hh_2010'],
+		lowinc_hh_pct_2010 = props['lowinc_hh_pct_2010'],
+		disabled_pop_pct_2010 = props['disabled_pop_pct_2010'],
+		lep_pop_pct_2010 = props['lep_pop_pct_2010'],
+		minority_pop_pct_2010 = props['minority_pop_pct_2010'],
+		pop_75plus_pct_2010 = props['pop_75plus_pct_2010'],
+		pop_u18_pct_2010 = props['pop_u18_pct_2010'],
+		total_pop_2010 = props['total_pop_2010'],
+		total_civ_noninst_pop_2010 = props['total_civ_nonist_pop_2010'],
+		total_disabled_pop_2010 = props['total_disabled_pop_2010'],
+		total_emp_2010 = props['total_emp_2010'],
+		total_lep_pop_2010 = props['total_lep_pop_2010'],
+		total_minority_pop_2010 = props['total_minority_pop_2010'],
+		total_pop_75plus_2010 = props['total_pop_75plus_2010'],
+		total_pop_u18_2010 = props['total_pop_u18_2010'];
 	
+// For starters, just dump this information to the console	
+	console.log('TAZ ' + taz);
+	console.log('Town: ' + town);
+	console.log('Land area: ' + land_area.toFixed(2) + ' SqMi.');
+	//
+	console.log('Households: ' + census_hh_2010.toFixed(0));
+	console.log('Low income households: ' + total_lowinc_hh_2010.toFixed(0));
+	console.log('Zero vehicle households: ' + total_zero_veh_hh_2010.toFixed(0));
+	//
+	// console.log(lowinc_hh_pct_2010.toFixed(2));
+	// console.log(disabled_pop_pct_2010.toFixed(2));
+	// console.log(lep_pop_pct_2010.toFixed(2));
+	// console.log(minority_pop_pct_2010.toFixed(2));
+	// console.log(pop_75plus_pct_2010.toFixed(2));
+	// console.log(pop_u18_pct_2010.toFixed(2));
+	//
+	console.log('Total population (2010):' + total_pop_2010.toFixed(0));
+	// console.log(total_civ_noninst_pop_2010.toFixed(0));
+	console.log('Total disabled population: ' +  total_disabled_pop_2010.toFixed(0));
+	console.log('Total employement: ' + total_emp_2010.toFixed(0));
+	console.log('Total limied English proficienty population: ' + total_lep_pop_2010.toFixed(0));
+	console.log('Total minority population: ' + total_minority_pop_2010.toFixed(0));
+	console.log('Total population over 75 years of age: ' + total_pop_75plus_2010.toFixed(0));
+	console.log('Total population under 18 years of age: ' + total_pop_u18_2010.toFixed(0)); 
+
+	return;
+} // render_taz_props()
+
+function render_taz_data(taz_feature) {
 	// First, the attribute (properties) data
-    var props = taz_feature.getProperties();
-    // *** TBD: Render this stuff
+	render_taz_props(taz_feature);
     
     // Second, the spatial data
     // Get the source for the TAZ vector layer
@@ -110,7 +159,7 @@ function render_taz_data(taz_feature) {
     // Pan/zoom map to the extent of the TAZ
     var extent = oTazLayer.getSource().getExtent();
     ol_map.getView().fit(extent, ol_map.getSize());
-	
+	return; 
 } // render_taz_data()
 
 function process_geocoded_location(data) {
@@ -120,9 +169,8 @@ function process_geocoded_location(data) {
 	var y_coord = temp.location.y;
 	
 	// DEBUG
-	console.log('x = ' + x_coord + ', y = ' + y_coord);	
+	// console.log('x = ' + x_coord + ', y = ' + y_coord);	
 	
-
 	// Construct CQL "INTERSECTS" filter to use in WFS request
     // Note: The first parameter of the INTERSECTS filer is the attribute containing the geographic data in the layer being queried.
 	var cqlFilter = "INTERSECTS(";
@@ -131,8 +179,9 @@ function process_geocoded_location(data) {
 	cqlFilter += "POINT(";
 	cqlFilter += x_coord + " " + y_coord;
 	cqlFilter += "))";
+	
 	// DEBUG
-	console.log(cqlFilter);
+	// console.log(cqlFilter);
 
     var szUrl = wfsServerRoot + '?';
     szUrl += '&service=wfs';
@@ -142,8 +191,9 @@ function process_geocoded_location(data) {
     szUrl += '&outputformat=json';
 	szUrl += '&srsname=EPSG:4326';  // NOTE: We must reproject the native geometry of the feature to the SRS of the map!
     szUrl += '&cql_filter=' + cqlFilter;    
-     // DEBUG
-    console.log(szUrl);
+	
+    // DEBUG
+    //console.log(szUrl);
         
     $.ajax({  url		: szUrl,
 			  type		: 'GET',
@@ -205,7 +255,6 @@ function submit_geocode_request(street, city, zip) {
 								return;
 							} // error handler for Geocode Address AJAX request
 		});	
-	
 } // submit_geocode_request()
 
 function initialize() {
@@ -221,7 +270,6 @@ function initialize() {
 	// UI event handler
 	$('#execute').on('click', 
 		function(e) {
-			console.log("Enterd click event handler.");
 			var temp = $('#address').val();
 			// Replace blanks in address field with '+', per geocoding API
 			var address = temp.replaceAll(' ', '+');
