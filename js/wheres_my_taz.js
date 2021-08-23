@@ -92,8 +92,65 @@ function myTazLayerStyle(feature, resolution) {
 }
 oTazLayer.setStyle(myTazLayerStyle);
 
-function render_all_taz_props(demographic_data, demand_data) {
+function render_all_taz_props(demographics, demand) {
 	var _DEBUG_HOOK = 0;
+	var taz = demographics['taz'],
+	    town = demographics['town'],
+		land_area = demographics['land_area'],
+		census_hh_2010 = demographics['census_hh_2010'],
+		total_lowinc_hh_2010 = demographics['total_lowinc_hh_2010'],
+		total_zero_veh_hh_2010 = demographics['total_zero_veh_hh_2010'],
+		lowinc_hh_pct_2010 = demographics['lowinc_hh_pct_2010'],
+		disabled_pop_pct_2010 = demographics['disabled_pop_pct_2010'],
+		lep_pop_pct_2010 = demographics['lep_pop_pct_2010'],
+		minority_pop_pct_2010 = demographics['minority_pop_pct_2010'],
+		pop_75plus_pct_2010 = demographics['pop_75plus_pct_2010'],
+		pop_u18_pct_2010 = demographics['pop_u18_pct_2010'],
+		total_pop_2010 = demographics['total_pop_2010'],
+		total_civ_noninst_pop_2010 = demographics['total_civ_nonist_pop_2010'],
+		total_disabled_pop_2010 = demographics['total_disabled_pop_2010'],
+		total_emp_2010 = demographics['total_emp_2010'],
+		total_lep_pop_2010 = demographics['total_lep_pop_2010'],
+		total_minority_pop_2010 = demographics['total_minority_pop_2010'],
+		total_pop_75plus_2010 = demographics['total_pop_75plus_2010'],
+		total_pop_u18_2010 = demographics['total_pop_u18_2010'];
+		
+	var total = demand['total_trips'],
+	    auto = demand['total_auto'],
+		nm = demand['total_nm'],
+        truck = demand['total_truck'],
+		transit = demand['total_transit'];
+	
+// For starters, just dump this information to the console	
+	console.log('TAZ ' + taz);
+	console.log('Town: ' + town);
+	console.log('Land area: ' + land_area.toFixed(2) + ' SqMi.');
+	//
+	console.log('Households: ' + census_hh_2010.toFixed(0));
+	console.log('Low income households: ' + total_lowinc_hh_2010.toFixed(0));
+	console.log('Zero vehicle households: ' + total_zero_veh_hh_2010.toFixed(0));
+	//
+	// console.log(lowinc_hh_pct_2010.toFixed(2));
+	// console.log(disabled_pop_pct_2010.toFixed(2));
+	// console.log(lep_pop_pct_2010.toFixed(2));
+	// console.log(minority_pop_pct_2010.toFixed(2));
+	// console.log(pop_75plus_pct_2010.toFixed(2));
+	// console.log(pop_u18_pct_2010.toFixed(2));
+	//
+	console.log('Total population (2010):' + total_pop_2010.toFixed(0));
+	// console.log(total_civ_noninst_pop_2010.toFixed(0));
+	console.log('Total disabled population: ' +  total_disabled_pop_2010.toFixed(0));
+	console.log('Total employement: ' + total_emp_2010.toFixed(0));
+	console.log('Total limied English proficienty population: ' + total_lep_pop_2010.toFixed(0));
+	console.log('Total minority population: ' + total_minority_pop_2010.toFixed(0));
+	console.log('Total population over 75 years of age: ' + total_pop_75plus_2010.toFixed(0));
+	console.log('Total population under 18 years of age: ' + total_pop_u18_2010.toFixed(0)); 
+	
+	console.log('Total demand = ' + total.toFixed(2));
+	console.log('Auto demand = ' + auto.toFixed(2));
+	console.log('Non-motorized demand = ' + nm.toFixed(2));
+	console.log('Truck demand = ' + truck.toFixed(2));
+	console.log('Transit demand = ' + transit.toFixed(2));
 	
 	return; 
 } // render_all_taz_props()
