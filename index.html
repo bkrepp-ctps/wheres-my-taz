@@ -18,7 +18,89 @@
 		<input id="execute" value="Where's my TAZ?" type="button">
 		</span>
 	</div>
-    <div id="map" class="map"></div> 
+	<div id="wrapper">
+		<div id="map" class="map">
+		</div> 
+	    <div id="output">
+			<table id="output_table">
+				<tbody>
+					<tr>
+						<td>TAZ ID</td>
+						<td id="taz"></td>
+					</tr>
+					<tr>
+						<td>Town</td>
+						<td id="town"></td>
+					</tr>
+					<tr>
+						<td>Land Area</td>
+						<td id="land_area"></td>
+					</tr>
+					<tr>
+						<td>Population</td>
+						<td id="population"></td>
+					</tr>		
+					<tr>
+						<td>Minority Population</td>
+						<td id="minority_pop"></td>
+					</tr>
+					<tr>
+						<td>LEP Population</td>
+						<td id="lep_pop"></td>
+					</tr>
+					<tr>
+						<td>Disabled Population</td>
+						<td id="disabled_pop"></td>
+					</tr>
+					<tr>
+						<td>Population over 75</td>
+						<td id="pop_over_75"></td>
+					</tr>
+					<tr>
+						<td>Population under 18</td>
+						<td id="pop_under_18"></td>
+					</tr>
+					<tr>
+						<td>Employment</td>
+						<td id="employment"></td>
+					</tr>
+					<tr>
+						<td>Households</td>
+						<td id="households"></td>
+					</tr>
+					<tr>
+						<td>Low-income households</td>
+						<td id="low_inc_hh"></td>
+					</tr>
+					<tr>
+						<td>Zero-vehicle households</td>
+						<td id="zv_hh"></td>
+					</tr>
+					
+					<tr>
+						<td>Total Demand</td>
+						<td id="total_demand"></td>
+					</tr>					
+					<tr>
+						<td>Auto Demand</td>
+						<td id="auto_demand"></td>
+					</tr>					
+					<tr>
+						<td>Non-motorized Demand</td>
+						<td id="nm_demand"></td>
+					</tr>					
+					<tr>
+						<td>Truck Demand</td>
+						<td id="truck_demand"></td>
+					</tr>
+					<tr>
+						<td>Transit Demand</td>
+						<td id="transit_demand"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
 	<script> 
 		$(document).ready(function() { initialize(); });
     </script>
