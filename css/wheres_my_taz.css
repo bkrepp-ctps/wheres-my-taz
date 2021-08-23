@@ -35,8 +35,18 @@
 #ui {
 	margin-bottom: 10px;
 }
-
+#wrapper {
+	display: flex;
+	flex-flow: row-wrap;
+	justify-content: flex-start;
+	align-items: flex-start;
+}
 #map {
+	order: 1;	/* flex order within wrapper div */
 	height:600px; 
 	width:810px;
+	margin-right: 10px;
+}
+#output {
+	order:2; /* flex order within wrapper div */
 }
