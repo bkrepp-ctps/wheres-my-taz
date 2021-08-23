@@ -21,6 +21,8 @@ if (location.hostname.includes('appsrvr3')) {
 var wmsServerRoot = serverRoot + '/wms'; 
 var wfsServerRoot = serverRoot + '/wfs'; 
 var demographics_layer = nameSpace + ':' + 'dest2040_taz_demographics';
+// The following isn't a (geographic) "layer", but rather a geometry-less table
+var taz_demand_table = nameSpace + ':' + 'ctps_modx_taz_demand_summary_base';
 
 // OpenLayers 'map' object:
 var ol_map = null;
@@ -90,7 +92,13 @@ function myTazLayerStyle(feature, resolution) {
 }
 oTazLayer.setStyle(myTazLayerStyle);
 
+function render_all_taz_props(demographic_data, demand_data) {
+	var _DEBUG_HOOK = 0;
+	
+	return; 
+} // render_all_taz_props()
 
+// *** 08/23/2021 -  This funcdtion is now vestigial. ***
 function render_taz_props(taz_feature) {
 	var props = taz_feature.getProperties();
 
@@ -144,10 +152,7 @@ function render_taz_props(taz_feature) {
 } // render_taz_props()
 
 function render_taz_data(taz_feature) {
-	// First, the attribute (properties) data
-	render_taz_props(taz_feature);
-    
-    // Second, the spatial data
+	// First, the spatial data
     // Get the source for the TAZ vector layer
 	var vSource = oTazLayer.getSource();
 	// Clear anything that might previously be in the vector layer
@@ -155,10 +160,67 @@ function render_taz_data(taz_feature) {
     vSource.addFeature(taz_feature);
     // Set the source of the vector layer to the taz_feature
 	oTazLayer.setSource(vSource);
-    
     // Pan/zoom map to the extent of the TAZ
     var extent = oTazLayer.getSource().getExtent();
-    ol_map.getView().fit(extent, ol_map.getSize());
+    ol_map.getView().fit(extent, ol_map.getSize());	
+	
+	// Second, the non-spatial data.
+	// This comes from two places: 
+	//    (1) the demographic attributes ('properites') in the TAZ feature layer
+	//    (2) the TAZ demand data (from the model, exported by MoDX) to a "geometry-less table"
+	// We have (1), and now need to get (2) using another AJAZ request.
+	// When we have both, we can render them all..
+	
+	// (1) Demographic attributes
+	var demographic_props = taz_feature.getProperties();
+	// We need to get the TAZ ID for the following WFS request
+	var taz_id = demographic_props['taz'];
+	
+	// (2) Get the TAZ demand data, and when in hand, render the whole kit-and-kaboodle
+	// Construct the WFS request
+	var cqlFilter = "id=" + taz_id;
+	
+	// DEBUG
+	console.log(cqlFilter);
+
+    var szUrl = wfsServerRoot + '?';
+    szUrl += '&service=wfs';
+    szUrl += '&version=1.0.0';
+    szUrl += '&request=getfeature';
+    szUrl += '&typename='+taz_demand_table;
+    szUrl += '&outputformat=json';
+    szUrl += '&cql_filter=' + cqlFilter;    
+	
+    // DEBUG
+    console.log(szUrl);
+        
+    $.ajax({  url		: szUrl,
+			  type		: 'GET',
+			  dataType	: 'json',
+			  success	: 	function (data, textStatus, jqXHR) {	
+								var reader, aFeatures = [], props = {}, len, demand_props;
+								reader = new ol.format.GeoJSON();
+								aFeatures = reader.readFeatures(jqXHR.responseText);
+								len = aFeatures.length;
+								if (len === 0) {
+									alert('WFS request to get TAZ demand data returned no records.');
+									return;
+								} else if (len > 1) {
+									alert('WFS request to get TAZ demand data returned more than one record.');
+								}
+								var _DEBUG_HOOK = 0;
+								demand_props = aFeatures[0].getProperties();
+								// Render both the demographic and demand data
+								render_all_taz_props(demographic_props, demand_props);
+								return;
+                            },
+        error       :   function (qXHR, textStatus, errorThrown ) {
+                            alert('WFS request to get data TAZ demand data failed.\n' +
+                                    'Status: ' + textStatus + '\n' +
+                                    'Error:  ' + errorThrown);
+							return;
+                        } // error handler for WFS request
+    });	
 	return; 
 } // render_taz_data()
 
