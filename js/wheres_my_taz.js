@@ -92,8 +92,9 @@ function myTazLayerStyle(feature, resolution) {
 }
 oTazLayer.setStyle(myTazLayerStyle);
 
+var debugFlag = false;
+
 function render_all_taz_props(demographics, demand) {
-	var _DEBUG_HOOK = 0;
 	var taz = demographics['taz'],
 	    town = demographics['town'],
 		land_area = demographics['land_area'],
@@ -121,92 +122,52 @@ function render_all_taz_props(demographics, demand) {
         truck = demand['total_truck'],
 		transit = demand['total_transit'];
 	
-// For starters, just dump this information to the console	
-	console.log('TAZ ' + taz);
-	console.log('Town: ' + town);
-	console.log('Land area: ' + land_area.toFixed(2) + ' SqMi.');
-	//
-	console.log('Households: ' + census_hh_2010.toFixed(0));
-	console.log('Low income households: ' + total_lowinc_hh_2010.toFixed(0));
-	console.log('Zero vehicle households: ' + total_zero_veh_hh_2010.toFixed(0));
-	//
-	// console.log(lowinc_hh_pct_2010.toFixed(2));
-	// console.log(disabled_pop_pct_2010.toFixed(2));
-	// console.log(lep_pop_pct_2010.toFixed(2));
-	// console.log(minority_pop_pct_2010.toFixed(2));
-	// console.log(pop_75plus_pct_2010.toFixed(2));
-	// console.log(pop_u18_pct_2010.toFixed(2));
-	//
-	console.log('Total population (2010):' + total_pop_2010.toFixed(0));
-	// console.log(total_civ_noninst_pop_2010.toFixed(0));
-	console.log('Total disabled population: ' +  total_disabled_pop_2010.toFixed(0));
-	console.log('Total employement: ' + total_emp_2010.toFixed(0));
-	console.log('Total limied English proficienty population: ' + total_lep_pop_2010.toFixed(0));
-	console.log('Total minority population: ' + total_minority_pop_2010.toFixed(0));
-	console.log('Total population over 75 years of age: ' + total_pop_75plus_2010.toFixed(0));
-	console.log('Total population under 18 years of age: ' + total_pop_u18_2010.toFixed(0)); 
+	if (debugFlag) {
+		console.log('TAZ ' + taz);
+		console.log('Town: ' + town);
+		console.log('Land area: ' + land_area.toFixed(2) + ' SqMi.');
+		console.log('Total population (2010):' + total_pop_2010.toFixed(0));
+		// console.log(total_civ_noninst_pop_2010.toFixed(0));
+		console.log('Total disabled population: ' +  total_disabled_pop_2010.toFixed(0));
+		console.log('Total limied English proficienty population: ' + total_lep_pop_2010.toFixed(0));
+		console.log('Total minority population: ' + total_minority_pop_2010.toFixed(0));
+		console.log('Total population over 75 years of age: ' + total_pop_75plus_2010.toFixed(0));
+		console.log('Total population under 18 years of age: ' + total_pop_u18_2010.toFixed(0)); 	
+		console.log('Total employment: ' + total_emp_2010.toFixed(0));		
+		console.log('Households: ' + census_hh_2010.toFixed(0));
+		console.log('Low income households: ' + total_lowinc_hh_2010.toFixed(0));
+		console.log('Zero vehicle households: ' + total_zero_veh_hh_2010.toFixed(0));
+		console.log('Total demand = ' + total.toFixed(2));
+		console.log('Auto demand = ' + auto.toFixed(2));
+		console.log('Non-motorized demand = ' + nm.toFixed(2));
+		console.log('Truck demand = ' + truck.toFixed(2));
+		console.log('Transit demand = ' + transit.toFixed(2));
+	} // debug
 	
-	console.log('Total demand = ' + total.toFixed(2));
-	console.log('Auto demand = ' + auto.toFixed(2));
-	console.log('Non-motorized demand = ' + nm.toFixed(2));
-	console.log('Truck demand = ' + truck.toFixed(2));
-	console.log('Transit demand = ' + transit.toFixed(2));
+	$('#taz').html(taz);
+	$('#town').html(town);
+	$('#land_area').html(land_area.toFixed(2) + ' SqMi.');
+	
+	$('#population').html(total_pop_2010.toFixed(0));
+	$('#minority_pop').html(total_minority_pop_2010.toFixed(0));
+	$('#lep_pop').html(total_lep_pop_2010.toFixed(0));
+	$('#disabled_pop').html(total_disabled_pop_2010.toFixed(0));
+	$('#pop_over_75').html(total_pop_75plus_2010.toFixed(0));
+	$('#pop_under_18').html(total_pop_u18_2010.toFixed(0));
+	$('#employment').html(total_emp_2010.toFixed(0));
+	
+	$('#households').html(census_hh_2010.toFixed(0));
+	$('#low_inc_hh').html(total_lowinc_hh_2010.toFixed(0));
+	$('#zv_hh').html(total_zero_veh_hh_2010.toFixed(0));
+
+	$('#total_demand').html(total.toFixed(2));
+	$('#auto_demand').html(auto.toFixed(2));
+	$('#nm_demand').html(nm.toFixed(2));
+	$('#truck_demand').html(truck.toFixed(2));
+	$('#transit_demand').html(transit.toFixed(2));
 	
 	return; 
 } // render_all_taz_props()
-
-// *** 08/23/2021 -  This funcdtion is now vestigial. ***
-function render_taz_props(taz_feature) {
-	var props = taz_feature.getProperties();
-
-	var taz = props['taz'],
-		town = props['town'],
-		land_area = props['land_area'],
-		census_hh_2010 = props['census_hh_2010'],
-		total_lowinc_hh_2010 = props['total_lowinc_hh_2010'],
-		total_zero_veh_hh_2010 = props['total_zero_veh_hh_2010'],
-		lowinc_hh_pct_2010 = props['lowinc_hh_pct_2010'],
-		disabled_pop_pct_2010 = props['disabled_pop_pct_2010'],
-		lep_pop_pct_2010 = props['lep_pop_pct_2010'],
-		minority_pop_pct_2010 = props['minority_pop_pct_2010'],
-		pop_75plus_pct_2010 = props['pop_75plus_pct_2010'],
-		pop_u18_pct_2010 = props['pop_u18_pct_2010'],
-		total_pop_2010 = props['total_pop_2010'],
-		total_civ_noninst_pop_2010 = props['total_civ_nonist_pop_2010'],
-		total_disabled_pop_2010 = props['total_disabled_pop_2010'],
-		total_emp_2010 = props['total_emp_2010'],
-		total_lep_pop_2010 = props['total_lep_pop_2010'],
-		total_minority_pop_2010 = props['total_minority_pop_2010'],
-		total_pop_75plus_2010 = props['total_pop_75plus_2010'],
-		total_pop_u18_2010 = props['total_pop_u18_2010'];
-	
-// For starters, just dump this information to the console	
-	console.log('TAZ ' + taz);
-	console.log('Town: ' + town);
-	console.log('Land area: ' + land_area.toFixed(2) + ' SqMi.');
-	//
-	console.log('Households: ' + census_hh_2010.toFixed(0));
-	console.log('Low income households: ' + total_lowinc_hh_2010.toFixed(0));
-	console.log('Zero vehicle households: ' + total_zero_veh_hh_2010.toFixed(0));
-	//
-	// console.log(lowinc_hh_pct_2010.toFixed(2));
-	// console.log(disabled_pop_pct_2010.toFixed(2));
-	// console.log(lep_pop_pct_2010.toFixed(2));
-	// console.log(minority_pop_pct_2010.toFixed(2));
-	// console.log(pop_75plus_pct_2010.toFixed(2));
-	// console.log(pop_u18_pct_2010.toFixed(2));
-	//
-	console.log('Total population (2010):' + total_pop_2010.toFixed(0));
-	// console.log(total_civ_noninst_pop_2010.toFixed(0));
-	console.log('Total disabled population: ' +  total_disabled_pop_2010.toFixed(0));
-	console.log('Total employement: ' + total_emp_2010.toFixed(0));
-	console.log('Total limied English proficienty population: ' + total_lep_pop_2010.toFixed(0));
-	console.log('Total minority population: ' + total_minority_pop_2010.toFixed(0));
-	console.log('Total population over 75 years of age: ' + total_pop_75plus_2010.toFixed(0));
-	console.log('Total population under 18 years of age: ' + total_pop_u18_2010.toFixed(0)); 
-
-	return;
-} // render_taz_props()
 
 function render_taz_data(taz_feature) {
 	// First, the spatial data
@@ -237,8 +198,9 @@ function render_taz_data(taz_feature) {
 	// Construct the WFS request
 	var cqlFilter = "id=" + taz_id;
 	
-	// DEBUG
-	console.log(cqlFilter);
+	if (debugFlag) {
+		console.log(cqlFilter);
+	}
 
     var szUrl = wfsServerRoot + '?';
     szUrl += '&service=wfs';
@@ -248,8 +210,9 @@ function render_taz_data(taz_feature) {
     szUrl += '&outputformat=json';
     szUrl += '&cql_filter=' + cqlFilter;    
 	
-    // DEBUG
-    console.log(szUrl);
+    if (debugFlag) {
+		console.log(szUrl);
+	}
         
     $.ajax({  url		: szUrl,
 			  type		: 'GET',
@@ -265,7 +228,6 @@ function render_taz_data(taz_feature) {
 								} else if (len > 1) {
 									alert('WFS request to get TAZ demand data returned more than one record.');
 								}
-								var _DEBUG_HOOK = 0;
 								demand_props = aFeatures[0].getProperties();
 								// Render both the demographic and demand data
 								render_all_taz_props(demographic_props, demand_props);
@@ -287,8 +249,9 @@ function process_geocoded_location(data) {
 	var x_coord = temp.location.x;
 	var y_coord = temp.location.y;
 	
-	// DEBUG
-	// console.log('x = ' + x_coord + ', y = ' + y_coord);	
+	if (debugFlag) {
+		console.log('x = ' + x_coord + ', y = ' + y_coord);	
+	}
 	
 	// Construct CQL "INTERSECTS" filter to use in WFS request
     // Note: The first parameter of the INTERSECTS filer is the attribute containing the geographic data in the layer being queried.
@@ -299,8 +262,9 @@ function process_geocoded_location(data) {
 	cqlFilter += x_coord + " " + y_coord;
 	cqlFilter += "))";
 	
-	// DEBUG
-	// console.log(cqlFilter);
+	if (debugFlag) {
+		console.log(cqlFilter);
+	}
 
     var szUrl = wfsServerRoot + '?';
     szUrl += '&service=wfs';
@@ -311,8 +275,9 @@ function process_geocoded_location(data) {
 	szUrl += '&srsname=EPSG:4326';  // NOTE: We must reproject the native geometry of the feature to the SRS of the map!
     szUrl += '&cql_filter=' + cqlFilter;    
 	
-    // DEBUG
-    //console.log(szUrl);
+    if (debugFlag) {
+		console.log(szUrl);
+	}
         
     $.ajax({  url		: szUrl,
 			  type		: 'GET',
@@ -325,7 +290,6 @@ function process_geocoded_location(data) {
 									alert('WFS request to get data from INTERSECTS query returned no features.');
 									return;
 								}
-								var _DEBUG_HOOK = 0;
 								render_taz_data(aFeatures[0]);
 								return;
                             },
@@ -349,7 +313,6 @@ function submit_geocode_request(street, city, zip) {
 			 type		: 'GET',
 			 dataType	: 'json',
 			 success	: 	function (data, textStatus, jqXHR) {	
-								var _DEBUG_HOOK = 1;
 								var n_candidates = data.candidates.length;
 								if (n_candidates ===  0) {
 									alert('Geocoding request for address failed to find any candidates.\nTry again.');
@@ -367,7 +330,6 @@ function submit_geocode_request(street, city, zip) {
 								return;
 							},
 			error       :   function (qXHR, textStatus, errorThrown ) {
-								var _DEBUG_HOOK = 0;
 								alert('HTTP request to geocode address failed\n' +
 								      'Status: ' + textStatus + '\n' +
 								      'Error:  ' + errorThrown);
