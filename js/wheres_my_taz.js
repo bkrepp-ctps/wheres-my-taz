@@ -16,6 +16,9 @@ if (location.hostname.includes('appsrvr3')) {
 	nameSpace = 'ctps_pg';
 	geometry_field_name = 'shape';
 } else {
+	// The following statement is a hack to work-around having to use www2.bostonmpo.org 
+	// to get around CloudFront caching during development:
+	serverRoot = 'https://www.ctps.org';
     serverRoot += '/maploc/';
 	nameSpace = 'postgis';
 	geometry_field_name = 'wkb_geometry';
@@ -25,6 +28,8 @@ var wfsServerRoot = serverRoot + '/wfs';
 var demographics_layer = nameSpace + ':' + 'dest2040_taz_demographics';
 // The following isn't a (geographic) "layer", but rather a geometry-less table
 var taz_demand_table = nameSpace + ':' + 'ctps_modx_taz_demand_summary_base';
+
+var massGIS_geocoding_REST_ep = 'https://gisprpxy.itd.state.ma.us/arcgisserver/rest/services/CensusTIGER2010/GeocodeServer/findAddressCandidates';
 
 // OpenLayers 'map' object:
 var ol_map = null;
@@ -305,7 +310,7 @@ function process_geocoded_location(data) {
 } // handle_geocode_response()
 
 function submit_geocode_request(street, city, zip) {
-	var request_url = 'http://gisprpxy.itd.state.ma.us/arcgisserver/rest/services/CensusTIGER2010/GeocodeServer/findAddressCandidates';
+	var request_url = massGIS_geocoding_REST_ep;
 	request_url += '?';
 	request_url += 'Street=' + street; // Note "+" for whitespace
 	request_url += '&City=' + city;
