@@ -47,16 +47,16 @@
 	width:810px;
 	margin-right: 10px;
 }
-#output_div {
+#output_wrapper {
 	order:2; /* flex order within wrapper div */
 	margin-left: 10px;
 	display: flex;
 	flex-flow: column-nowrap;
 }
 #demographics_div {
-	order: 1; /* flex order within output_div */
+	order: 1; /* flex order within output_wrapper */
 	margin-bottom: 10px;
 }
 #model_data_div {
-	order: 2; /* flex order within output_div */
+	order: 2; /* flex order within output_wrapper */
 }
