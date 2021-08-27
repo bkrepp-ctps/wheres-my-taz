@@ -9,13 +9,13 @@
 	<script src="./js/wheres_my_taz.js"></script>
   </head>
   <body>
-    <h2>Where's My TAZ?</h2>
+    <h2>Where's My TAZ? What's My TAZ?</h2>
 	<div id="ui">
 		<span>
 		Address: <input id="address" type="text"/>
 		Town: <input id="city" type="text"/>
 		ZIP Code: <input id="zip" type="text"/>
-		<input id="execute" value="Where's my TAZ?" type="button">
+		<input id="execute" value="Find my TAZ!" type="button">
 		</span>
 	</div>
 	<div id="wrapper">
@@ -23,6 +23,7 @@
 		</div> 
 	    <div id="output_wrapper">
 			<div id="demographics_div">
+				<h4>Some demographic data...</h4>
 				<table id="demographics_table">
 					<tbody>
 						<tr>
@@ -79,13 +80,14 @@
 						</tr>
 				</tbody>
 			</table>
-		</div> <!-- demographics_div -->
-		<div id="model_data_div">
+			</div> <!-- demographics_div -->
+			<div id="model_data_div">
+				<h4>Some travel demand data...</h4>
 				<table id="model_data_table>
 					<tbody>
 						<tr>
 							<td>Total Demand</td>
-							<td id="total_demand"></td>
+							<td id="total_trips"></td>
 						</tr>
 						<tr>
 							<td>Auto Demand</td>

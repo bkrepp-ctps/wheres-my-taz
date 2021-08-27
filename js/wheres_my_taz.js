@@ -123,7 +123,7 @@ function render_all_taz_props(demographics, demand) {
 		total_pop_75plus_2010 = demographics['total_pop_75plus_2010'],
 		total_pop_u18_2010 = demographics['total_pop_u18_2010'];
 		
-	var total = demand['total_trips'],
+	var total_trips = demand['total_trips'],
 	    auto = demand['total_auto'],
 		nm = demand['total_nm'],
         truck = demand['total_truck'],
@@ -167,7 +167,7 @@ function render_all_taz_props(demographics, demand) {
 	$('#low_inc_hh').html(total_lowinc_hh_2010.toFixed(0));
 	$('#zv_hh').html(total_zero_veh_hh_2010.toFixed(0));
 
-	$('#total_demand').html(total.toFixed(2));
+	$('#total_trips').html(total_trips.toFixed(2));
 	$('#auto_demand').html(auto.toFixed(2));
 	$('#nm_demand').html(nm.toFixed(2));
 	$('#truck_demand').html(truck.toFixed(2));
