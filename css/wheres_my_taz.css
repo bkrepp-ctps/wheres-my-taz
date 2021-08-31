@@ -43,8 +43,8 @@
 }
 #map {
 	order: 1;	/* flex order within wrapper div */
-	height:600px; 
-	width:810px;
+	height:680px; 
+	width:850px;
 	margin-right: 10px;
 }
 #output_wrapper {
