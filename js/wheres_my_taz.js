@@ -171,6 +171,8 @@ function render_all_taz_props(demographics, demand) {
 	$('#truck_demand').html(truck.toFixed(2));
 	$('#transit_demand').html(transit.toFixed(2));
 	
+	$('#output_wrapper').show();
+	
 	return; 
 } // render_all_taz_props()
 
@@ -344,15 +346,16 @@ function submit_geocode_request(street, city, zip) {
 } // submit_geocode_request()
 
 function initialize() {
-	var map_center = [-71.057083, 42.3601];
-	var map_zoom_level = 12;
+	$('#output_wrapper').hide();
+	var initial_map_center = [-71.057083, 42.3601];
+	var initial_zoom_level = 12;
     ol_map = new ol.Map({ layers: [ new ol.layer.Tile({ source: new ol.source.OSM() }),
 	                                oTazLayer
                                   ],
                            target: 'map',
                            view: new ol.View({ projection: 'EPSG:4326', 
-						                       center: map_center,
-                                               zoom: map_zoom_level
+						                       center: initial_map_center,
+                                               zoom:   initial_zoom_level
                                             })
                          });
 	// UI event handlers
@@ -368,6 +371,15 @@ function initialize() {
 	});
 	$('#reset').on('click',
 		function(e) {
-			var _DEBUG_HOOK = 0;
+			// Clear the textual output area
+			$('#output_wrapper').hide();
+			// Clear anything that might previously be in the vector layer
+		    var vSource = oTazLayer.getSource();
+            vSource.clear();
+			// Set map to initial extent and zoom level
+			var v = ol_map.getView();
+			v.setCenter(initial_map_center);
+			v.setZoom(initial_zoom_level);
+			ol_map.setView(v);
 	});
 } // initialize()
