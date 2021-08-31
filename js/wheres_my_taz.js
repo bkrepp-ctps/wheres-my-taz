@@ -3,10 +3,7 @@
 //     Documentation: https://wiki.state.ma.us/display/massgis/ArcGIS+Server+-+Geocoding+-+Census+TIGER+2010
 // Author: Ben Krepp
 
-// Comment for testing purposes.
-
-
-// Varioius things for WMS and WFS layers
+// Varioius things for accessing WMS and WFS layers
 // First, folderol to allow the app to run on appsrvr3 as well as "in the wild"
 var serverRoot = location.protocol + '//' + location.hostname;
 var nameSpace;
@@ -29,6 +26,7 @@ var demographics_layer = nameSpace + ':' + 'dest2040_taz_demographics';
 // The following isn't a (geographic) "layer", but rather a geometry-less table
 var taz_demand_table = nameSpace + ':' + 'ctps_modx_taz_demand_summary_base';
 
+// URL for MassGIS Geocoding REST API endpoint
 var massGIS_geocoding_REST_ep = 'https://gisprpxy.itd.state.ma.us/arcgisserver/rest/services/CensusTIGER2010/GeocodeServer/findAddressCandidates';
 
 // OpenLayers 'map' object:
@@ -346,16 +344,18 @@ function submit_geocode_request(street, city, zip) {
 } // submit_geocode_request()
 
 function initialize() {
+	var map_center = [-71.057083, 42.3601];
+	var map_zoom_level = 12;
     ol_map = new ol.Map({ layers: [ new ol.layer.Tile({ source: new ol.source.OSM() }),
 	                                oTazLayer
                                   ],
                            target: 'map',
                            view: new ol.View({ projection: 'EPSG:4326', 
-						                       center: [-71.057083, 42.3601],
-                                               zoom: 12
+						                       center: map_center,
+                                               zoom: map_zoom_level
                                             })
                          });
-	// UI event handler
+	// UI event handlers
 	$('#execute').on('click', 
 		function(e) {
 			var temp = $('#address').val();
@@ -365,5 +365,9 @@ function initialize() {
 			var zip = $('#zip').val();
 			// Submit request, and let response handler to the rest...
 			submit_geocode_request(address, city, zip);
+	});
+	$('#reset').on('click',
+		function(e) {
+			var _DEBUG_HOOK = 0;
 	});
 } // initialize()
