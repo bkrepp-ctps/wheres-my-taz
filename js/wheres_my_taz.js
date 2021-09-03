@@ -24,7 +24,9 @@ var wmsServerRoot = serverRoot + '/wms';
 var wfsServerRoot = serverRoot + '/wfs'; 
 var demographics_layer = nameSpace + ':' + 'dest2040_taz_demographics';
 // The following isn't a (geographic) "layer", but rather a geometry-less table
-var taz_demand_table = nameSpace + ':' + 'ctps_modx_taz_demand_summary_base';
+var taz_demand_table_name = nameSpace + ':' + 'ctps_modx_taz_demand_summary_base';
+// Demand data, by TAZ, loaded from CSV file - to replace the above, read by WFS requests.
+var demand_data = []; 
 
 // URL for MassGIS Geocoding REST API endpoint
 var massGIS_geocoding_REST_ep = 'https://gisprpxy.itd.state.ma.us/arcgisserver/rest/services/CensusTIGER2010/GeocodeServer/findAddressCandidates';
@@ -202,6 +204,22 @@ function render_taz_data(taz_feature) {
 	var taz_id = demographic_props['taz'];
 	
 	// (2) Get the TAZ demand data, and when in hand, render the whole kit-and-kaboodle
+	
+	var demand_props = [];
+	// The following query should return an array containing a *single* record:
+	demand_recs = _.filter(demand_data, function(rec) { return rec['id'] == taz_id; });
+	// Sanity checks
+	if (demand_recs.length === 0) {
+		alert('Error: Zero records found in demand data table for TAZ ' + taz_id + '.');
+		return;
+	} else if (demand_recs.length > 1) {
+		alert('Error: ' + demand_recs.length + ' records found in demand data table for TAZ ' + taz_id + '.');
+		return;
+	} else {
+			render_all_taz_props(demographic_props, demand_recs[0])
+	}
+	
+/* 	*** OLD WFS IMPLEMENTATION BELOW THIS POINT
 	// Construct the WFS request
 	var cqlFilter = "id=" + taz_id;
 	
@@ -213,7 +231,7 @@ function render_taz_data(taz_feature) {
     szUrl += '&service=wfs';
     szUrl += '&version=1.0.0';
     szUrl += '&request=getfeature';
-    szUrl += '&typename='+taz_demand_table;
+    szUrl += '&typename='+taz_demand_table_name;
     szUrl += '&outputformat=json';
     szUrl += '&cql_filter=' + cqlFilter;    
 	
@@ -247,6 +265,7 @@ function render_taz_data(taz_feature) {
 							return;
                         } // error handler for WFS request
     });	
+END OF OLD WFS IMPLEMENTATION *** */
 	return; 
 } // render_taz_data()
 
@@ -381,5 +400,26 @@ function initialize() {
 			v.setCenter(initial_map_center);
 			v.setZoom(initial_zoom_level);
 			ol_map.setView(v);
+	});
+	// Load demand data from CSV file
+	$.ajax({ url: "csv/demand_all_modes.csv",
+			 async: false,
+			 success: function (csvd) {
+				demand_data = $.csv.toObjects(csvd);
+				// Convert numeric fields, read in as text from CSV, to numeric type
+				demand_data.forEach(function(rec) {
+					rec['id'] = +rec['id'];
+					rec['total_trips'] = +rec['total_trips'];
+					rec['total_auto'] = +rec['total_auto'];
+					rec['total_truck'] = +rec['total_truck'];
+					rec['total_transit'] = +rec['total_transit'];
+					rec['total_nm'] = +rec['total_nm'];
+				});
+				var _DEBUG_HOOK = 0;
+			 },
+			 dataType: "text",
+			 complete: function () {
+				// call a function on complete 
+		   }
 	});
 } // initialize()
