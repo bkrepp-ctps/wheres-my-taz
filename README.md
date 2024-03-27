@@ -1,9 +1,19 @@
 # wheres-my-taz
+"Where's my TAZ?" demo app.
 
-"Where's my TAZ?" demo app.  
-Uses MassGIS's Geocoding REST API  
-Documentation: https://wiki.state.ma.us/display/massgis/ArcGIS+Server+-+Geocoding+-+Census+TIGER+2010  
-Author: Ben Krepp
+This app allows the user to view data on the TAZ that contains an address,
+in Massachusetts, entered by the user. The address is geocoded 
+using MassGIS's Geocoding REST API. If the geocoding is successful,
+the app then:
+* pans-and-zooms the map to the TAZ containing the coordinates returned by geocoding 
+* highlights this TAZ on the map 
+* displays selected information about the TAZ: some demographic data and travel demand data
+
+For this demo, the demographic data is read from the WFS service __postgis::dest2040_taz_demographics__
+running on CTPS's GeoServer;
+the travel demand data is read from a CSV file \(__data/csv/demand_all_modes.csv__\).
+
+Of course, this is just a _demonstration_ of the kind\(s\) of data this kind of app can deliver.
 
 ## Libraries Required
 * jQUery version 1.11.2
