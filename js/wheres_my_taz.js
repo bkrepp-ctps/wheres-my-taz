@@ -1,6 +1,7 @@
 // "Where's my TAZ?" demo app.
 // Uses MassGIS Geocoding REST API
 //     Documentation: https://wiki.state.ma.us/display/massgis/ArcGIS+Server+-+Geocoding+-+Census+TIGER+2010
+//     Note: As of March 2024, the documentation link above no longer works
 // Author: Ben Krepp
 
 // Varioius things for accessing WMS and WFS layers
@@ -29,7 +30,7 @@ var taz_demand_table_name = nameSpace + ':' + 'ctps_modx_taz_demand_summary_base
 var demand_data = []; 
 
 // URL for MassGIS Geocoding REST API endpoint
-var massGIS_geocoding_REST_ep = 'https://gisprpxy.itd.state.ma.us/arcgisserver/rest/services/CensusTIGER2010/GeocodeServer/findAddressCandidates';
+var massGIS_geocoding_REST_ep = 'https://arcgisserver.digital.mass.gov/arcgisserver/rest/services/CensusTIGER2010/GeocodeServer/findAddressCandidates';
 
 // OpenLayers 'map' object:
 var ol_map = null;
@@ -218,54 +219,6 @@ function render_taz_data(taz_feature) {
 	} else {
 			render_all_taz_props(demographic_props, demand_recs[0])
 	}
-	
-/* 	*** OLD WFS IMPLEMENTATION BELOW THIS POINT
-	// Construct the WFS request
-	var cqlFilter = "id=" + taz_id;
-	
-	if (debugFlag) {
-		console.log(cqlFilter);
-	}
-
-    var szUrl = wfsServerRoot + '?';
-    szUrl += '&service=wfs';
-    szUrl += '&version=1.0.0';
-    szUrl += '&request=getfeature';
-    szUrl += '&typename='+taz_demand_table_name;
-    szUrl += '&outputformat=json';
-    szUrl += '&cql_filter=' + cqlFilter;    
-	
-    if (debugFlag) {
-		console.log(szUrl);
-	}
-        
-    $.ajax({  url		: szUrl,
-			  type		: 'GET',
-			  dataType	: 'json',
-			  success	: 	function (data, textStatus, jqXHR) {	
-								var reader, aFeatures = [], props = {}, len, demand_props;
-								reader = new ol.format.GeoJSON();
-								aFeatures = reader.readFeatures(jqXHR.responseText);
-								len = aFeatures.length;
-								if (len === 0) {
-									alert('WFS request to get TAZ demand data returned no records.');
-									return;
-								} else if (len > 1) {
-									alert('WFS request to get TAZ demand data returned more than one record.');
-								}
-								demand_props = aFeatures[0].getProperties();
-								// Render both the demographic and demand data
-								render_all_taz_props(demographic_props, demand_props);
-								return;
-                            },
-        error       :   function (qXHR, textStatus, errorThrown ) {
-                            alert('WFS request to get data TAZ demand data failed.\n' +
-                                    'Status: ' + textStatus + '\n' +
-                                    'Error:  ' + errorThrown);
-							return;
-                        } // error handler for WFS request
-    });	
-END OF OLD WFS IMPLEMENTATION *** */
 	return; 
 } // render_taz_data()
 
